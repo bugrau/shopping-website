@@ -1,3 +1,7 @@
 /backend/.env
 /backend/vendor
 /frontend/node_modules
+/backup/.env
+/backend/new-backend/.env
+/backend/new-backend/vendor
+/frontend/node_modules
