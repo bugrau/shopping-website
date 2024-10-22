@@ -20,7 +20,12 @@ class ShoppingListItem extends Model
 
 
 
-    protected $fillable = ['name', 'quantity', 'purchased'];
+    protected $fillable = ['name', 'quantity', 'purchased', 'category', 'user_id'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 }
 

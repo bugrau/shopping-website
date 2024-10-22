@@ -2,18 +2,22 @@
 
 
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ShoppingListController;
 
 use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/items', [ShoppingListController::class, 'index']);
+// Authentication routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/items', [ShoppingListController::class, 'store']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::apiResource('items', ShoppingListController::class);
+});
 
-Route::put('/items/{item}', [ShoppingListController::class, 'update']);
 
-Route::delete('/items/{item}', [ShoppingListController::class, 'destroy']);
 
 

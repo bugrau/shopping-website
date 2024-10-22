@@ -7,8 +7,7 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/",
-            "Bugra\\ShoppingListBackend\\": "src/"
+            "Database\\Seeders\\": "database/seeders/"
         }
     },
     "authors": [

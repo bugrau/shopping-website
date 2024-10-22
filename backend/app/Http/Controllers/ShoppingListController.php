@@ -10,72 +10,77 @@ use App\Models\ShoppingListItem;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Validator;
+
 
 
 class ShoppingListController extends Controller
 
 {
 
-    public function index()
-
+    public function index(Request $request)
     {
-
-        return ShoppingListItem::all();
-
+        return $request->user()->shoppingListItems;
     }
-
-
 
     public function store(Request $request)
-
     {
+        $validator = Validator::make($request->all(), [
 
-        $request->validate([
+            'name' => 'required|string|max:255',
 
-            'name' => 'required|string',
+            'quantity' => 'required|integer|min:1|max:1000',
 
-            'quantity' => 'required|integer|min:1',
+            'category' => 'nullable|string|max:255',
 
         ]);
 
 
 
-        return ShoppingListItem::create($request->all());
+        if ($validator->fails()) {
 
+            return response()->json(['errors' => $validator->errors()], 422);
+
+        }
+
+        $item = $request->user()->shoppingListItems()->create($request->all());
+        return $item;
     }
-
-
 
     public function update(Request $request, ShoppingListItem $item)
-
     {
+        $this->authorize('update', $item);
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
 
-            'purchased' => 'required|boolean',
+            'name' => 'sometimes|required|string|max:255',
+
+            'quantity' => 'sometimes|required|integer|min:1|max:1000',
+
+            'purchased' => 'sometimes|required|boolean',
+
+            'category' => 'nullable|string|max:255',
 
         ]);
 
 
 
+        if ($validator->fails()) {
+
+            return response()->json(['errors' => $validator->errors()], 422);
+
+        }
+
         $item->update($request->all());
-
         return $item;
-
     }
 
-
-
     public function destroy(ShoppingListItem $item)
-
     {
+        $this->authorize('delete', $item);
 
         $item->delete();
-
         return response()->json(null, 204);
-
     }
 
 }
-
-

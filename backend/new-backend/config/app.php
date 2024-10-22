@@ -148,11 +148,18 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
-        // Application Service Providers...
+        /*
+         * Package Service Providers...
+         */
+        Laravel\Sanctum\SanctumServiceProvider::class,
+
+        /*
+         * Application Service Providers...
+         */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,  // Uncomment this line
+        App\Providers\RouteServiceProvider::class,
     ],
 
 ];
