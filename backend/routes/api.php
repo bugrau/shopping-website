@@ -15,7 +15,10 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::apiResource('items', ShoppingListController::class);
+    Route::get('/items', [ShoppingListController::class, 'index']);
+    Route::post('/items', [ShoppingListController::class, 'store']);
+    Route::put('/items/{item}', [ShoppingListController::class, 'update']);
+    Route::delete('/items/{item}', [ShoppingListController::class, 'destroy']);
 });
 
 

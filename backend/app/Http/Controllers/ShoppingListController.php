@@ -12,26 +12,36 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Support\Facades\Log;
+
 
 
 class ShoppingListController extends Controller
 
 {
 
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
+
     public function index(Request $request)
     {
+        \Log::info('User: ' . $request->user());
+        \Log::info('Token: ' . $request->bearerToken());
         return $request->user()->shoppingListItems;
     }
 
     public function store(Request $request)
     {
+        \Log::info('Request user: ' . $request->user());
+        \Log::info('Request all: ' . json_encode($request->all()));
+
         $validator = Validator::make($request->all(), [
 
             'name' => 'required|string|max:255',
 
             'quantity' => 'required|integer|min:1|max:1000',
-
-            'category' => 'nullable|string|max:255',
 
         ]);
 
@@ -58,8 +68,6 @@ class ShoppingListController extends Controller
             'quantity' => 'sometimes|required|integer|min:1|max:1000',
 
             'purchased' => 'sometimes|required|boolean',
-
-            'category' => 'nullable|string|max:255',
 
         ]);
 

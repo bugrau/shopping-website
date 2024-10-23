@@ -2,12 +2,12 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { updateItem, deleteItem } from '../redux/shoppingListSlice';
 import { 
-  List, ListItem, ListItemIcon, ListItemText, ListItemSecondaryAction,
-  IconButton, Checkbox, Typography
+  List, ListItem, ListItemText, ListItemSecondaryAction,
+  IconButton, Checkbox
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-function ShoppingList({ items }) {
+const ShoppingList = ({ items }) => {
   const dispatch = useDispatch();
 
   const handleToggle = (item) => {
@@ -21,31 +21,15 @@ function ShoppingList({ items }) {
   return (
     <List>
       {items.map((item) => (
-        <ListItem key={item.id} dense button onClick={() => handleToggle(item)}>
-          <ListItemIcon>
-            <Checkbox
-              edge="start"
-              checked={item.purchased}
-              tabIndex={-1}
-              disableRipple
-            />
-          </ListItemIcon>
+        <ListItem key={item.id} disablePadding>
+          <Checkbox
+            edge="start"
+            checked={Boolean(item.purchased)} // Convert to boolean
+            onChange={() => handleToggle(item)}
+          />
           <ListItemText
             primary={item.name}
-            secondary={
-              <React.Fragment>
-                <Typography
-                  sx={{ display: 'inline' }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Quantity: {item.quantity}
-                </Typography>
-                {" — "}
-                {item.category || 'Uncategorized'}
-              </React.Fragment>
-            }
+            secondary={`Quantity: ${item.quantity}`}
             style={{ textDecoration: item.purchased ? 'line-through' : 'none' }}
           />
           <ListItemSecondaryAction>
@@ -57,6 +41,6 @@ function ShoppingList({ items }) {
       ))}
     </List>
   );
-}
+};
 
 export default ShoppingList;

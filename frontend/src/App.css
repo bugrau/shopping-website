@@ -1,10 +1,18 @@
 body {
-  background-color: #f0f8ff;
+  background-image: url('./assets/grocery-background.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
 }
 
 .App {
   text-align: center;
+  font-family: Arial, sans-serif;
+  color: #333;
+  padding: 20px;
 }
 
 .App-logo {
