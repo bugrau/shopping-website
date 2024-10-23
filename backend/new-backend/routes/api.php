@@ -1,64 +1,16 @@
-<?php
-
-
-
-
-
-
-
-use App\Http\Controllers\AuthController;
-
-
-
-use App\Http\Controllers\ShoppingListController;
-
-
-
-use Illuminate\Support\Facades\Route;
-
-
-
-
-
-
-
-// Authentication routes
-
-
-
-Route::post('/register', [AuthController::class, 'register']);
-
-
-
-Route::post('/login', [AuthController::class, 'login']);
-
-
-
-Route::post('/check-email', [AuthController::class, 'checkEmail']);
-
-
-
-
-
-
-
-Route::middleware('auth:sanctum')->group(function () {
-
-
-
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-
-
-    Route::apiResource('items', ShoppingListController::class);
-
-
-
-});
-
-
-
-
-
-
-
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ShoppingListController;
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/shopping-list', [ShoppingListController::class, 'index']);
+    Route::post('/shopping-list', [ShoppingListController::class, 'store']);
+    Route::put('/shopping-list/{id}', [ShoppingListController::class, 'update']);
+    Route::delete('/shopping-list/{id}', [ShoppingListController::class, 'destroy']);
+});
