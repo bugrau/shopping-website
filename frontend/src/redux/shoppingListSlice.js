@@ -2,25 +2,39 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import axios from 'axios';
 
+import { logout } from './authSlice'; // Add this import
+
+
 
 
 const API_URL = 'http://localhost:8000/api';
+
+// Helper function to get the auth token
+// Commented out for now, but kept for potential future use
+// const getAuthToken = () => {
+//   const auth = JSON.parse(localStorage.getItem('auth'));
+//   console.log('Auth from localStorage:', auth);
+//   return auth ? auth.access_token : null;
+// };
+
+
 
 
 
 export const fetchItems = createAsyncThunk(
   'shoppingList/fetchItems',
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      const response = await axios.get(`${API_URL}/items`, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
+      console.log('Fetching items with token:', auth.token);
+      const response = await axios.get(`${API_URL}/shopping-list`, {
+        headers: { Authorization: `Bearer ${auth.token}` }
       });
+      console.log('Fetched items:', response.data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error('Error fetching items:', error);
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch items');
     }
   }
 );
@@ -31,18 +45,12 @@ export const fetchItems = createAsyncThunk(
 
 export const addItem = createAsyncThunk(
   'shoppingList/addItem',
-  async (item, { rejectWithValue, getState }) => {
-    try {
-      const { auth } = getState();
-      const response = await axios.post(`${API_URL}/items`, item, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+  async (item, { getState }) => {
+    const { auth } = getState();
+    const response = await axios.post(`${API_URL}/shopping-list`, { ...item, purchased: false }, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    });
+    return response.data;
   }
 );
 
@@ -52,17 +60,18 @@ export const addItem = createAsyncThunk(
 
 export const updateItem = createAsyncThunk(
   'shoppingList/updateItem',
-  async (item, { rejectWithValue, getState }) => {
+  async (item, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      const response = await axios.put(`${API_URL}/items/${item.id}`, item, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
+      const response = await axios.put(`${API_URL}/shopping-list/${item.id}`, item, {
+        headers: { Authorization: `Bearer ${auth.token}` }
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      if (error.response && error.response.status === 404) {
+        return rejectWithValue('Item not found');
+      }
+      throw error;
     }
   }
 );
@@ -73,18 +82,12 @@ export const updateItem = createAsyncThunk(
 
 export const deleteItem = createAsyncThunk(
   'shoppingList/deleteItem',
-  async (id, { rejectWithValue, getState }) => {
-    try {
-      const { auth } = getState();
-      await axios.delete(`${API_URL}/items/${id}`, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      });
-      return id;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+  async (id, { getState }) => {
+    const { auth } = getState();
+    await axios.delete(`${API_URL}/shopping-list/${id}`, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    });
+    return id;
   }
 );
 
@@ -130,19 +133,13 @@ const shoppingListSlice = createSlice({
 
         state.status = 'failed';
 
-        state.error = action.payload?.message || 'Could not fetch items';
+        state.error = action.error.message;
 
       })
 
       .addCase(addItem.fulfilled, (state, action) => {
 
         state.items.push(action.payload);
-
-      })
-
-      .addCase(addItem.rejected, (state, action) => {
-
-        state.error = action.payload?.message || 'Could not add item';
 
       })
 
@@ -158,22 +155,21 @@ const shoppingListSlice = createSlice({
 
       })
 
-      .addCase(updateItem.rejected, (state, action) => {
-
-        state.error = action.payload?.message || 'Could not update item';
-
-      })
-
       .addCase(deleteItem.fulfilled, (state, action) => {
 
         state.items = state.items.filter((item) => item.id !== action.payload);
 
       })
 
-      .addCase(deleteItem.rejected, (state, action) => {
+      .addCase(updateItem.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to update item';
+      })
 
-        state.error = action.payload?.message || 'Could not delete item';
-
+      .addCase(logout, (state) => {
+        state.items = [];
+        state.status = 'idle';
+        state.error = null;
       });
 
   },
